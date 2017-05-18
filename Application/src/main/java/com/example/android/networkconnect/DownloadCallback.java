@@ -22,6 +22,8 @@ import android.support.annotation.IntDef;
 /**
  * Sample interface containing bare minimum methods needed for an asynchronous task
  * to update the UI Context.
+ * Interfaz de ejemplo que contiene métodos mínimos necesarios para una tarea asincrónica
+ * Para actualizar el contexto de la interfaz de usuario.
  */
 
 public interface DownloadCallback {
@@ -36,11 +38,16 @@ public interface DownloadCallback {
     /**
      * Indicates that the callback handler needs to update its appearance or information based on
      * the result of the task. Expected to be called from the main thread.
+     *
+     * Indica que el manejador de devolución de llamada debe actualizar su apariencia o información basada en
+     * El resultado de la tarea. Se espera que se llame desde el hilo principal.
      */
     void updateFromDownload(String result);
 
     /**
      * Get the device's active network status in the form of a NetworkInfo object.
+     *
+     * Obtener el estado activo de la red del dispositivo en forma de un objeto NetworkInfo.
      */
     NetworkInfo getActiveNetworkInfo();
 
@@ -48,12 +55,18 @@ public interface DownloadCallback {
      * Indicate to callback handler any progress update.
      * @param progressCode must be one of the constants defined in DownloadCallback.Progress.
      * @param percentComplete must be 0-100.
+     *
+     * Indicar al manejador de devolución de llamada cualquier actualización de progreso.
+     * @param progressCode debe ser una de las constantes definidas en DownloadCallback.Progress.
+     * @param percentComplete debe ser 0-100.
      */
     void onProgressUpdate(int progressCode, int percentComplete);
 
     /**
      * Indicates that the download operation has finished. This method is called even if the
      * download hasn't completed successfully.
+     * Indica que la operación de descarga ha finalizado. Este método se llama incluso si el
+     * La descarga no se ha completado correctamente.
      */
     void finishDownloading();
 

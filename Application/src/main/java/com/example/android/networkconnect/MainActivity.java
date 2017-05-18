@@ -31,19 +31,32 @@ import android.widget.TextView;
  * HTML. It uses a Fragment that encapsulates the network operations on an AsyncTask.
  *
  * This sample uses a TextView to display output.
+ *
+ * Ejemplo de actividad que demuestra cómo conectarse a la red y buscar
+ * HTML. Utiliza un fragmento que encapsula las operaciones de red en un AsyncTask.
+ *
+ * Este ejemplo utiliza un TextView para mostrar la salida.
  */
 public class MainActivity extends FragmentActivity implements DownloadCallback {
 
     // Reference to the TextView showing fetched data, so we can clear it with a button
     // as necessary.
+    // Referencia a TextView mostrando los datos obtenidos, para que podamos borrarlos con un botón
+    // según sea necesario.
     private TextView mDataText;
 
     // Keep a reference to the NetworkFragment which owns the AsyncTask object
     // that is used to execute network ops.
+
+    // Mantener una referencia al NetworkFragment que posee el objeto AsyncTask
+    // que se utiliza para ejecutar operaciones de red.
     private NetworkFragment mNetworkFragment;
 
     // Boolean telling us whether a download is in progress, so we don't trigger overlapping
     // downloads with consecutive button clicks.
+
+    // Boolean diciéndonos si una descarga está en progreso, por lo que no activamos la superposición
+    // descargas con clics de botón consecutivos.
     private boolean mDownloading = false;
 
     @Override
@@ -65,10 +78,13 @@ public class MainActivity extends FragmentActivity implements DownloadCallback {
         switch (item.getItemId()) {
             // When the user clicks FETCH, fetch the first 500 characters of
             // raw HTML from www.google.com.
+            // Cuando el usuario hace clic en FETCH, busca los primeros 500 caracteres de
+            // HTML sin procesar de www.google.com.
             case R.id.fetch_action:
                 startDownload();
                 return true;
             // Clear the text and cancel download.
+            // Borrar el texto y cancelar la descarga.
             case R.id.clear_action:
                 finishDownloading();
                 mDataText.setText("");
@@ -80,6 +96,7 @@ public class MainActivity extends FragmentActivity implements DownloadCallback {
     private void startDownload() {
         if (!mDownloading && mNetworkFragment != null) {
             // Execute the async download.
+            // Ejecuta la descarga asíncrona.
             mNetworkFragment.startDownload();
             mDownloading = true;
         }
@@ -114,6 +131,7 @@ public class MainActivity extends FragmentActivity implements DownloadCallback {
     public void onProgressUpdate(int progressCode, int percentComplete) {
         switch(progressCode) {
             // You can add UI behavior for progress updates here.
+            // Puede añadir el comportamiento de la interfaz de usuario para actualizaciones de progreso aquí.
             case Progress.ERROR:
                 break;
             case Progress.CONNECT_SUCCESS:

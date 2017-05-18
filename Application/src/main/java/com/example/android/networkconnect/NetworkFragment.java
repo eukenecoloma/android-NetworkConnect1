@@ -36,6 +36,7 @@ import javax.net.ssl.HttpsURLConnection;
 
 /**
  * Implementation of headless Fragment that runs an AsyncTask to fetch data from the network.
+ * Implementación de Fragmento sin cabeza que ejecuta un AsyncTask para obtener datos de la red.
  */
 public class NetworkFragment extends Fragment {
     public static final String TAG = "NetworkFragment";
@@ -49,6 +50,8 @@ public class NetworkFragment extends Fragment {
     /**
      * Static initializer for NetworkFragment that sets the URL of the host it will be downloading
      * from.
+     * Inicializador estático para NetworkFragment que establece la URL del host que estará descargando
+     * de.
      */
     public static NetworkFragment getInstance(FragmentManager fragmentManager, String url) {
         // Recover NetworkFragment in case we are re-creating the Activity due to a config change.
@@ -56,6 +59,11 @@ public class NetworkFragment extends Fragment {
         // the config change and has not finished yet.
         // The NetworkFragment is recoverable via this method because it calls
         // setRetainInstance(true) upon creation.
+        // Recuperar NetworkFragment en caso de que se vuelva a crear la actividad debido a un cambio de configuración.
+        // Esto es necesario porque NetworkFragment podría tener una tarea que comenzó a ejecutarse antes
+        // el cambio de configuración y no ha terminado todavía.
+        // El NetworkFragment es recuperable a través de este método porque llama
+        // setRetainInstance (true) en la creación.
         NetworkFragment networkFragment = (NetworkFragment) fragmentManager
                 .findFragmentByTag(NetworkFragment.TAG);
         if (networkFragment == null) {
@@ -72,6 +80,7 @@ public class NetworkFragment extends Fragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         // Retain this Fragment across configuration changes in the host Activity.
+        // Conserve este fragmento a través de los cambios de configuración en la actividad de host.
         setRetainInstance(true);
         mUrlString = getArguments().getString(URL_KEY);
     }
@@ -80,6 +89,7 @@ public class NetworkFragment extends Fragment {
     public void onAttach(Context context) {
         super.onAttach(context);
         // Host Activity will handle callbacks from task.
+        // La actividad del anfitrión manejará los callbacks de la tarea.
         mCallback = (DownloadCallback)context;
     }
 
@@ -87,18 +97,21 @@ public class NetworkFragment extends Fragment {
     public void onDetach() {
         super.onDetach();
         // Clear reference to host Activity.
+        // Borrar referencia a la actividad del host.
         mCallback = null;
     }
 
     @Override
     public void onDestroy() {
         // Cancel task when Fragment is destroyed.
+        // Cancelar la tarea cuando se destruye el fragmento.
         cancelDownload();
         super.onDestroy();
     }
 
     /**
      * Start non-blocking execution of DownloadTask.
+     * Inicie la ejecución sin bloqueo de DownloadTask.
      */
     public void startDownload() {
         cancelDownload();
@@ -108,6 +121,7 @@ public class NetworkFragment extends Fragment {
 
     /**
      * Cancel (and interrupt if necessary) any ongoing DownloadTask execution.
+     * Cancelar (e interrumpir si es necesario) cualquier ejecución en curso de descarga.
      */
     public void cancelDownload() {
         if (mDownloadTask != null) {
@@ -118,6 +132,7 @@ public class NetworkFragment extends Fragment {
 
     /**
      * Implementation of AsyncTask that runs a network operation on a background thread.
+     * Implementación de AsyncTask que ejecuta una operación de red en un hilo de fondo
      */
     private class DownloadTask extends AsyncTask<String, Integer, DownloadTask.Result> {
 
@@ -126,6 +141,11 @@ public class NetworkFragment extends Fragment {
          * download task has completed, either the result value or exception can be a non-null
          * value. This allows you to pass exceptions to the UI thread that were thrown during
          * doInBackground().
+         *
+         * Clase Wrapper que sirve como una unión de un valor de resultado y una excepción. Cuando el
+         * La tarea de descarga se ha completado, ya sea el valor del resultado o la excepción puede ser un valor no nulo
+         * Valor. Esto le permite pasar excepciones al subproceso de interfaz de usuario que se lanzaron durante
+         * DoInBackground ().
          */
         class Result {
             public String mResultValue;
@@ -140,6 +160,7 @@ public class NetworkFragment extends Fragment {
 
         /**
          * Cancel background network operation if we do not have network connectivity.
+         * Cancelar la operación de red en segundo plano si no tenemos conectividad de red.
          */
         @Override
         protected void onPreExecute() {
@@ -149,6 +170,7 @@ public class NetworkFragment extends Fragment {
                         (networkInfo.getType() != ConnectivityManager.TYPE_WIFI
                                 && networkInfo.getType() != ConnectivityManager.TYPE_MOBILE)) {
                     // If no connectivity, cancel task and update Callback with null data.
+                    // Si no hay conectividad, cancele la tarea y actualice Callback con datos nulos.
                     mCallback.updateFromDownload(null);
                     cancel(true);
                 }
@@ -157,6 +179,7 @@ public class NetworkFragment extends Fragment {
 
         /**
          * Defines work to perform on the background thread.
+         * Define el trabajo a realizar en el subproceso de fondo.
          */
         @Override
         protected Result doInBackground(String... urls) {
@@ -180,6 +203,8 @@ public class NetworkFragment extends Fragment {
 
         /**
          * Send DownloadCallback a progress update.
+         *
+         Enviar una actualización de la descarga de la descarga.
          */
         @Override
         protected void onProgressUpdate(Integer... values) {
@@ -191,6 +216,7 @@ public class NetworkFragment extends Fragment {
 
         /**
          * Updates the DownloadCallback with the result.
+         * Actualiza el DownloadCallback con el resultado.
          */
         @Override
         protected void onPostExecute(Result result) {
@@ -206,6 +232,7 @@ public class NetworkFragment extends Fragment {
 
         /**
          * Override to add special behavior for cancelled AsyncTask.
+         * Anular para agregar un comportamiento especial para AsyncTask cancelado.
          */
         @Override
         protected void onCancelled(Result result) {
@@ -215,6 +242,10 @@ public class NetworkFragment extends Fragment {
          * Given a URL, sets up a connection and gets the HTTP response body from the server.
          * If the network request is successful, it returns the response body in String form. Otherwise,
          * it will throw an IOException.
+         *
+         * Dada una URL, establece una conexión y obtiene el cuerpo de respuesta HTTP del servidor.
+         * Si la solicitud de red tiene éxito, devuelve el cuerpo de la respuesta en forma de String. De otra manera,
+         * Lanzará una IOException.
          */
         private String downloadUrl(URL url) throws IOException {
             InputStream stream = null;
@@ -223,15 +254,21 @@ public class NetworkFragment extends Fragment {
             try {
                 connection = (HttpsURLConnection) url.openConnection();
                 // Timeout for reading InputStream arbitrarily set to 3000ms.
+                // Tiempo de espera para leer InputStream arbitrariamente establecido en 3000ms
                 connection.setReadTimeout(3000);
                 // Timeout for connection.connect() arbitrarily set to 3000ms.
+                // Tiempo de espera para connection.connect () arbitrariamente establecido en 3000ms.
                 connection.setConnectTimeout(3000);
                 // For this use case, set HTTP method to GET.
+                // Para este caso de uso, establezca el método HTTP en GET.
                 connection.setRequestMethod("GET");
                 // Already true by default but setting just in case; needs to be true since this request
                 // is carrying an input (response) body.
+                // Ya es verdadera por defecto pero la configuración por si acaso; Debe ser cierto ya que esta solicitud
+                // lleva un cuerpo de entrada (respuesta).
                 connection.setDoInput(true);
                 // Open communications link (network traffic occurs here).
+                // Abrir enlace de comunicaciones (aquí se produce tráfico de red).
                 connection.connect();
                 publishProgress(DownloadCallback.Progress.CONNECT_SUCCESS);
                 int responseCode = connection.getResponseCode();
@@ -239,15 +276,18 @@ public class NetworkFragment extends Fragment {
                     throw new IOException("HTTP error code: " + responseCode);
                 }
                 // Retrieve the response body as an InputStream.
+                // Recupera el cuerpo de respuesta como InputStream.
                 stream = connection.getInputStream();
                 publishProgress(DownloadCallback.Progress.GET_INPUT_STREAM_SUCCESS, 0);
                 if (stream != null) {
                     // Converts Stream to String with max length of 500.
+                    // Convierte Stream a String con una longitud máxima de 500.
                     result = readStream(stream, 500);
                     publishProgress(DownloadCallback.Progress.PROCESS_INPUT_STREAM_SUCCESS, 0);
                 }
             } finally {
                 // Close Stream and disconnect HTTPS connection.
+                // Cierra la corriente y desconecta la conexión de HTTPS
                 if (stream != null) {
                     stream.close();
                 }
@@ -260,14 +300,18 @@ public class NetworkFragment extends Fragment {
 
         /**
          * Converts the contents of an InputStream to a String.
+         * Convierte el contenido de un InputStream en String.
          */
         private String readStream(InputStream stream, int maxLength) throws IOException {
             String result = null;
             // Read InputStream using the UTF-8 charset.
+            // Lee InputStream utilizando el conjunto de caracteres UTF-8
             InputStreamReader reader = new InputStreamReader(stream, "UTF-8");
             // Create temporary buffer to hold Stream data with specified max length.
+            // Crear buffer temporal para almacenar datos de flujo con longitud máxima especificada.
             char[] buffer = new char[maxLength];
             // Populate temporary buffer with Stream data.
+            // Llena el búfer temporal con datos de flujo.
             int numChars = 0;
             int readSize = 0;
             while (numChars < maxLength && readSize != -1) {
@@ -280,6 +324,9 @@ public class NetworkFragment extends Fragment {
                 // The stream was not empty.
                 // Create String that is actual length of response body if actual length was less than
                 // max length.
+                // El flujo no estaba vacío.
+                // Create String que es la longitud real del cuerpo de respuesta si la longitud real era menor que
+                // longitud máxima.
                 numChars = Math.min(numChars, maxLength);
                 result = new String(buffer, 0, numChars);
             }
